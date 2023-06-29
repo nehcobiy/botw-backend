@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from .models import Ingredient, Recipe
-from .serializers import IngredientSerializer, RecipeSerializer
+from .serializers import IngredientSerializer, RecipeSerializer, RecipeDetailSerializer
 from .api_exceptions import NonexistentIdException, InvalidIdException
 
 
@@ -10,7 +10,7 @@ class IngredientListView(generics.ListAPIView):
     serializer_class = IngredientSerializer
 
 class RecipeListView(generics.ListAPIView):
-    queryset = Recipe.objects.all().order_by('id')
+    queryset = Recipe.objects.order_by('id')
     serializer_class = RecipeSerializer
 
 class IngredientDetailView(generics.RetrieveAPIView):
@@ -19,18 +19,24 @@ class IngredientDetailView(generics.RetrieveAPIView):
 
     def get(self, request, ingredient_id):
         try:
-            ingredient_id > Recipe.objects.count()
+            ingredient_id > Ingredient.objects.count()
             ingredient = Ingredient.objects.get(id=ingredient_id)
             return Response(IngredientSerializer(ingredient).data)
         except:
             raise NonexistentIdException()
 
-class InvalidIngredientDetailView(generics.RetrieveAPIView):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
-    
-    def get(self, request, ingredient_id):
-        try:
-            int(ingredient_id)
-        except:
+class InvalidDetailView(generics.RetrieveAPIView):
+    def get(self, request, invalid_id):
             raise InvalidIdException()
+
+class RecipeDetailView(generics.RetrieveAPIView):
+    queryset = Recipe.objects.order_by('id')
+    serializer_class = RecipeDetailSerializer
+
+    def get(self, request, recipe_id):
+        try:
+            recipe_id > Recipe.objects.count()
+            recipe = Recipe.objects.get(id=recipe_id)
+            return Response(RecipeDetailSerializer(recipe).data)
+        except:
+            raise NonexistentIdException()
