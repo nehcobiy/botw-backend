@@ -21,3 +21,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ['id', 'category', 'name', 'duration', 'hearts','strength', 'type', 'image', 'type_image', 'ingredient1', 'ingredient2', 'ingredient3', 'ingredient4', 'ingredient5', 'notes', 'resale']
+
+class RecipeDetailSerializer(serializers.ModelSerializer):
+    ingredient1 = IngredientSerializer()
+    ingredient2 = IngredientSerializer()
+    ingredient3 = IngredientSerializer()
+    ingredient4 = IngredientSerializer()
+    ingredient5 = IngredientSerializer()
+
+    class Meta:
+        model = Recipe
+        fields = ['id', 'category', 'name', 'duration', 'hearts','strength', 'type', 'image', 'type_image', 'ingredient1', 'ingredient2', 'ingredient3', 'ingredient4', 'ingredient5', 'notes', 'resale']
