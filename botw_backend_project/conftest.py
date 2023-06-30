@@ -2,6 +2,7 @@ import pytest
 from api.models import Ingredient, Recipe
 import json
 import os
+from rest_framework.test import APIClient
 
 ingredients_data_path = os.path.join(os.path.dirname(__file__), "api/data/test/test-ingredients.json")
 ingredients = json.load(open(ingredients_data_path))
@@ -59,3 +60,4 @@ def test_recipes():
         recipe_list.append(test_recipe)    
     
     return recipe_list
+

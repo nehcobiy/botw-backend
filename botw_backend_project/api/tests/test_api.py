@@ -78,3 +78,28 @@ def test_get_recipes_detail_invalid_id_error(client, test_ingredients, test_reci
 
     assert response.status_code == 400
     assert response.data['message'] == 'Invalid id data type: id must be an integer'
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_get_ingredients_list_sort_category(client, test_ingredients):
+    url = reverse('ingredients_list')
+    response_monster = client.get(url, {'category': 'monsterparts'})
+    response_critters = client.get(url, {'category': 'critters'})
+    response_food = client.get(url, {'category': 'food'})
+    
+    monster = Ingredient.objects.filter(category='monster parts')
+    expected_monster_data = IngredientSerializer(monster, many=True).data
+
+    critters = Ingredient.objects.filter(category='critters')
+    expected_critters_data = IngredientSerializer(critters, many=True).data
+
+    food = Ingredient.objects.filter(category='food')
+    expected_food_data = IngredientSerializer(food, many=True).data
+
+    assert response_monster.status_code == 200
+    assert response_monster.data == expected_monster_data
+    assert response_critters.status_code == 200
+    assert response_critters.data == expected_critters_data
+    assert response_food.status_code == 200
+    assert response_food.data == expected_food_data
+
+    
