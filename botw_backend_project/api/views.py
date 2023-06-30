@@ -6,8 +6,26 @@ from .api_exceptions import NonexistentIdException, InvalidIdException
 
 
 class IngredientListView(generics.ListAPIView):
-    queryset = Ingredient.objects.order_by('id')
     serializer_class = IngredientSerializer
+
+    def get_queryset(self):
+        queryset = Ingredient.objects.order_by('id')
+        ingredient_category = self.request.query_params.get('category')
+        ingredient_effect = self.request.query_params.get('effect')
+
+        if ingredient_effect is not None:
+            if ingredient_effect == 'neutral':
+                queryset = queryset.filter(effect=None)
+            elif ingredient_effect != "":
+                queryset = queryset.filter(effect=ingredient_effect.capitalize())
+
+        if ingredient_category is not None:
+            if ingredient_category == 'monsterparts':
+                queryset = queryset.filter(category='monster parts')
+            elif ingredient_category != "":
+                queryset = queryset.filter(category=ingredient_category)
+        
+        return queryset
 
 class RecipeListView(generics.ListAPIView):
     queryset = Recipe.objects.order_by('id')
