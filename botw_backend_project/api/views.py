@@ -11,6 +11,13 @@ class IngredientListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Ingredient.objects.order_by('id')
         ingredient_category = self.request.query_params.get('category')
+        ingredient_effect = self.request.query_params.get('effect')
+
+        if ingredient_effect is not None:
+            if ingredient_effect == 'neutral':
+                queryset = queryset.filter(effect=None)
+            elif ingredient_effect != "":
+                queryset = queryset.filter(effect=ingredient_effect.capitalize())
 
         if ingredient_category is not None:
             if ingredient_category == 'monsterparts':

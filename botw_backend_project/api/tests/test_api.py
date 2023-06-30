@@ -80,7 +80,7 @@ def test_get_recipes_detail_invalid_id_error(client, test_ingredients, test_reci
     assert response.data['message'] == 'Invalid id data type: id must be an integer'
 
 @pytest.mark.django_db(reset_sequences=True)
-def test_get_ingredients_list_sort_category(client, test_ingredients):
+def test_get_ingredients_list_filter_category(client, test_ingredients):
     url = reverse('ingredients_list')
     response_monster = client.get(url, {'category': 'monsterparts'})
     response_critters = client.get(url, {'category': 'critters'})
@@ -102,4 +102,36 @@ def test_get_ingredients_list_sort_category(client, test_ingredients):
     assert response_food.status_code == 200
     assert response_food.data == expected_food_data
 
-    
+@pytest.mark.django_db(reset_sequences=True)
+def test_get_ingredients_list_filter_effect(client, test_ingredients):
+    url = reverse('ingredients_list')
+    response_neutral = client.get(url, {'effect': 'neutral'})
+    response_hasty = client.get(url, {'effect': 'hasty'})
+    response_tough = client.get(url, {'effect': 'tough'})
+
+    neutral = Ingredient.objects.filter(effect=None)
+    expected_neutral_data = IngredientSerializer(neutral, many=True).data
+
+    hasty = Ingredient.objects.filter(effect='Hasty')
+    expected_hasty_data = IngredientSerializer(hasty, many=True).data
+
+    tough = Ingredient.objects.filter(effect='Tough')
+    expected_tough_data = IngredientSerializer(tough, many=True).data
+
+    assert response_neutral.status_code == 200
+    assert response_neutral.data == expected_neutral_data
+    assert response_hasty.status_code == 200
+    assert response_hasty.data == expected_hasty_data
+    assert response_tough.status_code == 200
+    assert response_tough.data == expected_tough_data
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_get_ingredients_list_filters(client, test_ingredients):
+    url = reverse('ingredients_list')
+    response = client.get(url, {'category':'food', 'effect': 'spicy'})
+
+    spicy_food = Ingredient.objects.filter(category='food', effect='Spicy')
+    expected_data = IngredientSerializer(spicy_food, many=True).data
+
+    assert response.status_code == 200
+    assert response.data == expected_data
